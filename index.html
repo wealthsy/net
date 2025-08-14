@@ -481,11 +481,11 @@
         <main class="preview-pane">
             <section class="hero-banner">
                 <div class="hero-content">
-                    <h1 id="preview-title" class="hero-title">我的课程</h1>
-                    <p class="hero-subtitle">精选优质课程，助你用AI高效创作与成长</p>
+                    <h1 id="preview-title" class="hero-title">律师AI超级课程</h1>
+                    <p class="hero-subtitle">精选优质课程，助律师用AI办案与成长,在竞争中不落下风</p>
                     <div class="hero-stats">
                         <div class="stat-item">
-                            <span class="stat-number" id="stat-count">4+</span>
+                            <span class="stat-number" id="stat-count">5+</span>
                             <span class="stat-label">课程</span>
                         </div>
                         <div class="stat-item">
@@ -503,7 +503,7 @@
                 <div class="search-container">
                     <input type="text" id="search-input" placeholder="搜索课程...">
                 </div>
-                <div id="tag-filter-area"><button class="tag-filter active" data-tag="all">显示全部</button><button class="tag-filter" data-tag="剪辑">剪辑</button><button class="tag-filter" data-tag="申毅">申毅</button><button class="tag-filter" data-tag="教程">教程</button><button class="tag-filter" data-tag="陈佳">陈佳</button><button class="tag-filter" data-tag="高效">高效</button><button class="tag-filter" data-tag="效率">效率</button><button class="tag-filter" data-tag="审价">审价</button></div>
+                <div id="tag-filter-area"><button class="tag-filter active" data-tag="all">显示全部</button><button class="tag-filter" data-tag="剪辑">剪辑</button><button class="tag-filter" data-tag="申毅">申毅</button><button class="tag-filter" data-tag="教程">教程</button><button class="tag-filter" data-tag="陈佳">陈佳</button><button class="tag-filter" data-tag="高效">高效</button><button class="tag-filter" data-tag="效率">效率</button><button class="tag-filter" data-tag="审价">审价</button><button class="tag-filter" data-tag="好玩">好玩</button><button class="tag-filter" data-tag="有趣">有趣</button></div>
                 <div class="sort-container">
                     <button class="sort-btn" data-sort="date">发布时间排序</button>
                     <button class="sort-btn" data-sort="price">价格排序</button>
@@ -565,6 +565,20 @@
                         </div>
                         
                     </div>
+                </a><a href="https://www.bilibili.com/cheese/play/ss13815?query_from=0&amp;search_id=10696247045488333810&amp;search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&amp;csource=common_hpsearch_null_null&amp;spm_id_from=333.337.search-card.all.click" class="course-card" target="_blank" data-tags="好玩,有趣,陈佳">
+                    <img src="https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp" alt="摄影" class="card-cover">
+                    <div class="card-info">
+                        <h3 class="card-title">摄影</h3>
+                        
+                        <div class="card-meta">
+                            <span class="card-author" data-author="陈佳">陈佳</span>
+                            <span class="card-date">2025/8/14</span>
+                        </div>
+                        <div class="card-tags">
+                            <span class="card-tag">好玩</span><span class="card-tag">有趣</span>
+                        </div>
+                        
+                    </div>
                 </a></div>
             </section>
         </main>
@@ -577,8 +591,8 @@
                             const searchInput = document.getElementById('search-input');
                             const sortContainer = document.querySelector('.sort-container');
 
-                            let coursesData = [{"id":1755149323356,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"剪辑","price":"199","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"申毅","date":"2025-08-14","tags":["剪辑","申毅"]},{"id":1755149405704,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"打球","price":"299","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"陈佳","date":"2025-08-13","tags":["教程","陈佳"]},{"id":1755153944286,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"法律","price":"399","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"申毅","date":"2025-08-12","tags":["高效","效率","申毅"]},{"id":1755170315606,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"做饭","price":"499","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"审价","date":"2025-08-14","tags":["审价"]}];
-                            let allTags = new Set(["剪辑","申毅","教程","陈佳","高效","效率","审价"]);
+                            let coursesData = [{"id":1755149323356,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"剪辑","price":"199","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"申毅","date":"2025-08-14","tags":["剪辑","申毅"]},{"id":1755149405704,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"打球","price":"299","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"陈佳","date":"2025-08-13","tags":["教程","陈佳"]},{"id":1755153944286,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"法律","price":"399","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"申毅","date":"2025-08-12","tags":["高效","效率","申毅"]},{"id":1755170315606,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"做饭","price":"499","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"审价","date":"2025-08-14","tags":["审价"]},{"id":1755183070473,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"摄影","price":"","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"陈佳","date":"2025-08-14","tags":["好玩","有趣","陈佳"]}];
+                            let allTags = new Set(["剪辑","申毅","教程","陈佳","高效","效率","审价","好玩","有趣"]);
                             let currentSort = 'default';
                             let sortDirection = {};
 
