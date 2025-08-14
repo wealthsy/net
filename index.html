@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程展示页面生成器</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --text-color: #212529;
+            --light-gray: #e9ecef;
+            --shadow-light: 0 4px 8px rgba(0,0,0,0.1);
+            --shadow-dark: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .editor-pane {
+            width: 25%;
+            background-color: var(--surface-color);
+            padding: 2rem;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .preview-pane {
+            width: 75%;
+            padding: 0;
+            background-color: var(--background-color);
+            overflow-y: auto;
+        }
+
+        /* 横幅区域 */
+        .hero-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circuit" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 0 5 L 10 5 M 5 0 L 5 10" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23circuit)"/></svg>') repeat;
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #fff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin: 0 0 2rem 0;
+            font-weight: 300;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* 内容区域 */
+        .content-area {
+            padding: 0 2rem 2rem 2rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                height: auto;
+            }
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+            .editor-pane, .preview-pane {
+                width: 100%;
+                overflow-y: visible;
+            }
+        }
+
+        h1, h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+            width: 100%;
+            margin-top: auto; /* Pushes the button to the bottom */
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .export-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .text-controls { 
+            margin-top: 20px; 
+            padding-top: 10px; 
+            border-top: 1px solid #eee; 
+        }
+        .text-controls h3 { 
+            margin: 0 0 10px 0; 
+            font-size: 16px; 
+            color: #333; 
+        }
+
+        .export-controls label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .export-controls select, .text-controls input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .export-controls select:focus, .text-controls input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        #preview-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-container {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        #search-input {
+            width: 60%;
+            max-width: 400px;
+            padding: 0.75rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 20px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        #search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        #tag-filter-area {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .sort-container {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .sort-btn {
+            background-color: var(--surface-color);
+            color: var(--secondary-color);
+            border: 1px solid var(--light-gray);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn.active, .sort-btn:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .tag-filter {
+            background-color: var(--surface-color);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tag-filter.active, .tag-filter:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        #preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .course-card {
+            background-color: var(--surface-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-dark);
+        }
+
+        .card-cover {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+        }
+
+        .card-info {
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            line-height: 1.3;
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0 0 0.3rem 0;
+            color: var(--text-color);
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .card-price {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #ff6b35;
+            margin: 0 0 0.3rem 0;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .card-author {
+            font-size: 0.75rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .card-author:hover {
+            color: var(--primary-color);
+        }
+
+        .card-date {
+            font-size: 0.7rem;
+            color: #999;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .card-tags {
+            margin-top: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .card-tag {
+            background-color: var(--light-gray);
+            color: var(--secondary-color);
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+        }
+    
+                        /* 导出页面专用样式 - 确保与实时预览完全一致 */
+                        .container { 
+                            display: block; 
+                            height: auto;
+                        }
+                        .preview-pane { 
+                            width: 100%; 
+                            padding: 0;
+                            background-color: var(--background-color);
+                            overflow-y: visible;
+                        }
+                        .card-author { cursor: pointer; }
+                        .card-actions { display: none !important; }
+                        .edit-btn, .delete-btn { display: none !important; }
+                        
+                        /* 确保导出页面的缩放与实时预览一致，但不限制宽度 */
+                        html { 
+                            font-size: 16px; 
+                            -webkit-text-size-adjust: 100%;
+                            -ms-text-size-adjust: 100%;
+                        }
+                        body { 
+                            zoom: 1; 
+                            transform: scale(1);
+                            transform-origin: 0 0;
+                            
+                        }
+                        
+                        /* 保持内容区域的完整布局 */
+                        .content-area {
+                            padding: 0 2rem 2rem 2rem;
+                        }
+                        
+                        /* 确保网格布局与实时预览一致 */
+                        #preview-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                            gap: 1.5rem;
+                        }
+                    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+
+        <main class="preview-pane">
+            <section class="hero-banner">
+                <div class="hero-content">
+                    <h1 id="preview-title" class="hero-title">我的课程</h1>
+                    <p class="hero-subtitle">精选优质课程，助你用AI高效创作与成长</p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="stat-count">4+</span>
+                            <span class="stat-label">课程</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">AI</span>
+                            <span class="stat-label">创作主题</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">🎯</span>
+                            <span class="stat-label">实用与高效</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="content-area" style="padding: 0px 5rem 3rem;">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="搜索课程...">
+                </div>
+                <div id="tag-filter-area"><button class="tag-filter active" data-tag="all">显示全部</button><button class="tag-filter" data-tag="剪辑">剪辑</button><button class="tag-filter" data-tag="申毅">申毅</button><button class="tag-filter" data-tag="教程">教程</button><button class="tag-filter" data-tag="陈佳">陈佳</button><button class="tag-filter" data-tag="高效">高效</button><button class="tag-filter" data-tag="效率">效率</button><button class="tag-filter" data-tag="审价">审价</button></div>
+                <div class="sort-container">
+                    <button class="sort-btn" data-sort="date">发布时间排序</button>
+                    <button class="sort-btn" data-sort="price">价格排序</button>
+                    <button class="sort-btn active" data-sort="default">默认排序</button>
+                </div>
+                <div id="preview-grid"><a href="https://www.bilibili.com/cheese/play/ss13815?query_from=0&amp;search_id=10696247045488333810&amp;search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&amp;csource=common_hpsearch_null_null&amp;spm_id_from=333.337.search-card.all.click" class="course-card" target="_blank" data-tags="剪辑,申毅">
+                    <img src="https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp" alt="剪辑" class="card-cover">
+                    <div class="card-info">
+                        <h3 class="card-title">剪辑</h3>
+                        <p class="card-price">199.00元</p>
+                        <div class="card-meta">
+                            <span class="card-author" data-author="申毅">申毅</span>
+                            <span class="card-date">2025/8/14</span>
+                        </div>
+                        <div class="card-tags">
+                            <span class="card-tag">剪辑</span>
+                        </div>
+                        
+                    </div>
+                </a><a href="https://www.bilibili.com/cheese/play/ss13815?query_from=0&amp;search_id=10696247045488333810&amp;search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&amp;csource=common_hpsearch_null_null&amp;spm_id_from=333.337.search-card.all.click" class="course-card" target="_blank" data-tags="教程,陈佳">
+                    <img src="https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp" alt="打球" class="card-cover">
+                    <div class="card-info">
+                        <h3 class="card-title">打球</h3>
+                        <p class="card-price">299.00元</p>
+                        <div class="card-meta">
+                            <span class="card-author" data-author="陈佳">陈佳</span>
+                            <span class="card-date">2025/8/13</span>
+                        </div>
+                        <div class="card-tags">
+                            <span class="card-tag">教程</span>
+                        </div>
+                        
+                    </div>
+                </a><a href="https://www.bilibili.com/cheese/play/ss13815?query_from=0&amp;search_id=10696247045488333810&amp;search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&amp;csource=common_hpsearch_null_null&amp;spm_id_from=333.337.search-card.all.click" class="course-card" target="_blank" data-tags="高效,效率,申毅">
+                    <img src="https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp" alt="法律" class="card-cover">
+                    <div class="card-info">
+                        <h3 class="card-title">法律</h3>
+                        <p class="card-price">399.00元</p>
+                        <div class="card-meta">
+                            <span class="card-author" data-author="申毅">申毅</span>
+                            <span class="card-date">2025/8/12</span>
+                        </div>
+                        <div class="card-tags">
+                            <span class="card-tag">高效</span><span class="card-tag">效率</span>
+                        </div>
+                        
+                    </div>
+                </a><a href="https://www.bilibili.com/cheese/play/ss13815?query_from=0&amp;search_id=10696247045488333810&amp;search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&amp;csource=common_hpsearch_null_null&amp;spm_id_from=333.337.search-card.all.click" class="course-card" target="_blank" data-tags="审价">
+                    <img src="https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp" alt="做饭" class="card-cover">
+                    <div class="card-info">
+                        <h3 class="card-title">做饭</h3>
+                        <p class="card-price">499.00元</p>
+                        <div class="card-meta">
+                            <span class="card-author" data-author="审价">审价</span>
+                            <span class="card-date">2025/8/14</span>
+                        </div>
+                        <div class="card-tags">
+                            
+                        </div>
+                        
+                    </div>
+                </a></div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const previewGrid = document.getElementById('preview-grid');
+                            const tagFilterArea = document.getElementById('tag-filter-area');
+                            const searchInput = document.getElementById('search-input');
+                            const sortContainer = document.querySelector('.sort-container');
+
+                            let coursesData = [{"id":1755149323356,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"剪辑","price":"199","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"申毅","date":"2025-08-14","tags":["剪辑","申毅"]},{"id":1755149405704,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"打球","price":"299","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"陈佳","date":"2025-08-13","tags":["教程","陈佳"]},{"id":1755153944286,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"法律","price":"399","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"申毅","date":"2025-08-12","tags":["高效","效率","申毅"]},{"id":1755170315606,"url":"https://www.bilibili.com/cheese/play/ss13815?query_from=0&search_id=10696247045488333810&search_query=%E5%89%AA%E8%BE%91%E6%80%9D%E7%BB%B4%E7%A0%B4%E5%86%B0%E8%A1%8C%E5%8A%A8&csource=common_hpsearch_null_null&spm_id_from=333.337.search-card.all.click","title":"做饭","price":"499","cover":"https://case-1348859982.cos.ap-guangzhou.myqcloud.com/测试.webp","author":"审价","date":"2025-08-14","tags":["审价"]}];
+                            let allTags = new Set(["剪辑","申毅","教程","陈佳","高效","效率","审价"]);
+                            let currentSort = 'default';
+                            let sortDirection = {};
+
+                            // 搜索功能
+                            searchInput.addEventListener('input', function() {
+                                updatePreview();
+                            });
+
+                            // 排序功能
+                            sortContainer.addEventListener('click', function(e) {
+                                if (e.target.classList.contains('sort-btn')) {
+                                    const sortType = e.target.dataset.sort;
+                                    
+                                    if (sortType === 'default') {
+                                        document.querySelectorAll('.sort-btn').forEach(btn => {
+                                            btn.classList.remove('active');
+                                            btn.textContent = btn.textContent.replace(' ↑', '').replace(' ↓', '');
+                                        });
+                                        e.target.classList.add('active');
+                                        currentSort = 'default';
+                                        sortDirection = {};
+                                    } else {
+                                        document.querySelectorAll('.sort-btn').forEach(btn => {
+                                            if (btn.dataset.sort !== sortType) {
+                                                btn.classList.remove('active');
+                                                btn.textContent = btn.textContent.replace(' ↑', '').replace(' ↓', '');
+                                            }
+                                        });
+                                        
+                                        if (currentSort === sortType) {
+                                            sortDirection[sortType] = sortDirection[sortType] === 'asc' ? 'desc' : 'asc';
+                                        } else {
+                                            sortDirection[sortType] = 'desc';
+                                            currentSort = sortType;
+                                        }
+                                        
+                                        e.target.classList.add('active');
+                                        const arrow = sortDirection[sortType] === 'asc' ? ' ↑' : ' ↓';
+                                        const baseText = sortType === 'date' ? '发布时间排序' : '价格排序';
+                                        e.target.textContent = baseText + arrow;
+                                    }
+                                    
+                                    updatePreview();
+                                }
+                            });
+
+                            // 标签筛选
+                            tagFilterArea.addEventListener('click', function(e) {
+                                if (e.target.classList.contains('tag-filter')) {
+                                    const tag = e.target.dataset.tag;
+                                    filterByTag(tag);
+                                }
+                            });
+
+                            function formatPrice(price) {
+                                if (!price || price.trim() === '') return '';
+                                const trimmed = price.trim();
+                                if (trimmed === '免费' || trimmed.toLowerCase() === 'free') {
+                                    return '免费';
+                                }
+                                const num = parseFloat(trimmed);
+                                if (!isNaN(num)) {
+                                    return `${num.toFixed(2)}元`;
+                                }
+                                return trimmed;
+                            }
+
+                            function updatePreview() {
+                                previewGrid.innerHTML = '';
+                                const activeFilter = document.querySelector('.tag-filter.active')?.dataset.tag || 'all';
+                                const searchTerm = searchInput.value.toLowerCase();
+                                
+                                let filteredCourses = coursesData.filter(course => {
+                                    const tagMatch = activeFilter === 'all' || course.tags.includes(activeFilter);
+                                    const searchMatch = !searchTerm || 
+                                        course.title.toLowerCase().includes(searchTerm) ||
+                                        course.author.toLowerCase().includes(searchTerm) ||
+                                        course.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+                                    return tagMatch && searchMatch;
+                                });
+
+                                if (currentSort === 'date') {
+                                    filteredCourses.sort((a, b) => {
+                                        if (!a.date && !b.date) return 0;
+                                        if (!a.date) return 1;
+                                        if (!b.date) return -1;
+                                        const dateA = new Date(a.date);
+                                        const dateB = new Date(b.date);
+                                        const result = dateB - dateA;
+                                        return sortDirection[currentSort] === 'asc' ? -result : result;
+                                    });
+                                } else if (currentSort === 'price') {
+                                    filteredCourses.sort((a, b) => {
+                                        const priceA = parseFloat(a.price) || 0;
+                                        const priceB = parseFloat(b.price) || 0;
+                                        const result = priceB - priceA;
+                                        return sortDirection[currentSort] === 'asc' ? -result : result;
+                                    });
+                                }
+
+                                filteredCourses.forEach(course => {
+                                    const card = createCourseCard(course);
+                                    previewGrid.appendChild(card);
+                                });
+                            }
+
+                            function createCourseCard(course) {
+                                const cardLink = document.createElement('a');
+                                cardLink.href = course.url;
+                                cardLink.className = 'course-card';
+                                cardLink.target = '_blank';
+                                cardLink.dataset.tags = course.tags.join(',');
+
+                                const normalTags = course.tags.filter(t => t !== course.author);
+
+                                cardLink.innerHTML = `
+                                    <img src="${course.cover}" alt="${course.title}" class="card-cover">
+                                    <div class="card-info">
+                                        <h3 class="card-title">${course.title}</h3>
+                                        ${course.price ? `<p class="card-price">${formatPrice(course.price)}</p>` : ''}
+                                        <div class="card-meta">
+                                            <span class="card-author" data-author="${course.author}">${course.author}</span>
+                                            ${course.date ? `<span class="card-date">${new Date(course.date).toLocaleDateString()}</span>` : ''}
+                                        </div>
+                                        <div class="card-tags">
+                                            ${normalTags.map(tag => `<span class="card-tag">${tag}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                `;
+                                return cardLink;
+                            }
+
+                            function filterByTag(tag) {
+                                document.querySelectorAll('.tag-filter').forEach(btn => {
+                                    btn.classList.toggle('active', btn.dataset.tag === tag);
+                                });
+                                updatePreview();
+                            }
+
+                            // 初始化
+                            updatePreview();
+                        });
+                    </script>
+
+
+</body></html>
